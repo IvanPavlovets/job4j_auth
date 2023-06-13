@@ -5,9 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.domain.Person;
-import ru.job4j.repository.PersonRepository;
-
-import java.util.List;
+import ru.job4j.service.PersonSpringDataService;
 
 /**
  * контроллер описывает CRUD операции
@@ -22,11 +20,11 @@ import java.util.List;
 @RequestMapping("/persons")
 @RequiredArgsConstructor
 public class PersonController {
-    private final PersonRepository persons;
+    private final PersonSpringDataService persons;
 
     @GetMapping("/")
-    public List<Person> findAll() {
-        return (List<Person>) this.persons.findAll();
+    public Iterable<Person> findAll() {
+        return this.persons.findAll();
     }
 
     @GetMapping("/{id}")
@@ -41,7 +39,7 @@ public class PersonController {
     @PostMapping("/")
     public ResponseEntity<Person> create(@RequestBody Person person) {
         return new ResponseEntity<Person>(
-                this.persons.save(person),
+                this.persons.save(person).get(),
                 HttpStatus.CREATED
         );
     }
