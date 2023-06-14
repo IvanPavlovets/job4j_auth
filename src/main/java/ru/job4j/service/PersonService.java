@@ -11,8 +11,8 @@ public interface PersonService {
 
     Optional<Person> save(Person person);
 
-    void update(Person person);
+    Optional<Person> update(Person person);
 
-    void delete(Person person);
+    Optional<Person> deleteById(int personId);
 
 }

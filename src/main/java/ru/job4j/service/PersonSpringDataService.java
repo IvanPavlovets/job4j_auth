@@ -24,25 +24,31 @@ public class PersonSpringDataService implements PersonService {
 
     @Override
     public Optional<Person> save(Person person) {
-        return Optional.of(personRepository.save(person));
+        Optional<Person> rsl = Optional.empty();
+        try {
+            rsl = Optional.of(personRepository.save(person));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return rsl;
     }
 
     @Override
-    public void update(Person person) {
+    public Optional<Person> update(Person person) {
         var findedPerson = personRepository.findById(person.getId());
-        if (findedPerson.isEmpty()) {
-            throw new NullPointerException("Person id: " + person.getId() + " , not found");
+        if (findedPerson.isPresent()) {
+            personRepository.save(person);
         }
-        personRepository.save(person);
+        return findedPerson;
     }
 
     @Override
-    public void delete(Person person) {
-        var findedPerson = personRepository.findById(person.getId());
-        if (findedPerson.isEmpty()) {
-            throw new NullPointerException("Person id: " + person.getId() + " , not found");
+    public Optional<Person> deleteById(int personId) {
+        var findedPerson = personRepository.findById(personId);
+        if (findedPerson.isPresent()) {
+            personRepository.deleteById(personId);
         }
-        personRepository.delete(person);
+        return findedPerson;
     }
 
 }
