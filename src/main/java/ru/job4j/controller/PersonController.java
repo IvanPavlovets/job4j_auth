@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.domain.Person;
-import ru.job4j.service.PersonSpringDataService;
+import ru.job4j.service.PersonService;
 
 import java.util.Optional;
 
@@ -22,9 +22,14 @@ import java.util.Optional;
 @RequestMapping("/persons")
 @RequiredArgsConstructor
 public class PersonController {
-    private final PersonSpringDataService persons;
+    private final PersonService persons;
 
-    @GetMapping("/")
+    @PostMapping("/sign-up")
+    public ResponseEntity<Person> signUp(@RequestBody Person person) {
+        return getResponseEntity(this.persons.save(person), HttpStatus.CREATED, HttpStatus.CONFLICT);
+    }
+
+    @GetMapping("/all")
     public Iterable<Person> findAll() {
         return this.persons.findAll();
     }
@@ -34,10 +39,6 @@ public class PersonController {
         return getResponseEntity(this.persons.findById(id), HttpStatus.OK, HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping("/")
-    public ResponseEntity<Person> create(@RequestBody Person person) {
-        return getResponseEntity(this.persons.save(person), HttpStatus.CREATED, HttpStatus.CONFLICT);
-    }
 
     @PutMapping("/")
     public ResponseEntity<Person> update(@RequestBody Person person) {
@@ -50,7 +51,7 @@ public class PersonController {
     }
 
     private ResponseEntity<Person> getResponseEntity(Optional<Person> person, HttpStatus ok, HttpStatus notFound) {
-        return new ResponseEntity<Person>(
+        return new ResponseEntity<>(
                 person.orElse(new Person()),
                 person.isPresent() ? ok : notFound
         );

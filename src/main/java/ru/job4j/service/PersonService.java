@@ -15,4 +15,6 @@ public interface PersonService {
 
     Optional<Person> deleteById(int personId);
 
+    Optional<Person> findPersonByLogin(String login);
+
 }
