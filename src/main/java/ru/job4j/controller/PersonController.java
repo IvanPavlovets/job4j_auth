@@ -59,6 +59,14 @@ public class PersonController {
         return getResponseEntityById(this.persons.findById(id), id);
     }
 
+    @PatchMapping("/")
+    public Person updatePatch(@RequestBody Person person) throws Exception {
+        var updateUser = persons.updatePatch(person);
+        return updateUser.orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Impossible invoke set method from current object, Check set and get pairs.")
+        );
+    }
 
     @PutMapping("/")
     public ResponseEntity<Person> update(@RequestBody Person person) {
