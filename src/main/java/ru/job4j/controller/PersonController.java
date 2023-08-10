@@ -10,6 +10,7 @@ import org.springframework.util.MultiValueMapAdapter;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.job4j.domain.Person;
+import ru.job4j.domain.PersonDTO;
 import ru.job4j.service.PersonService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,25 +60,17 @@ public class PersonController {
         return getResponseEntityById(this.persons.findById(id), id);
     }
 
-    @PatchMapping("/")
-    public Person updatePatch(@RequestBody Person person) throws Exception {
-        var updateUser = persons.updatePatch(person);
-        return updateUser.orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Impossible invoke set method from current object, Check set and get pairs.")
-        );
-    }
 
     @PutMapping("/")
-    public ResponseEntity<Person> update(@RequestBody Person person) {
-        if (person.getLogin() == null || person.getPassword() == null) {
-            throw new NullPointerException("Login and password mustn't be empty");
+    public ResponseEntity<Person> updatePatch(@RequestBody PersonDTO personDTO) {
+        if (personDTO.getPassword() == null) {
+            throw new NullPointerException("Password mustn't be empty");
         }
-        if (person.getPassword().length() < 3 || person.getPassword().isEmpty() || person.getPassword().isBlank()) {
+        if (personDTO.getPassword().length() < 3 || personDTO.getPassword().isEmpty() || personDTO.getPassword().isBlank()) {
             throw new IllegalArgumentException(
                     "Invalid password. Password length must be more than 3 characters.");
         }
-        return getResponseEntity(this.persons.save(person));
+        return getResponseEntityById(this.persons.updatePatch(personDTO), personDTO.getId());
     }
 
     @DeleteMapping("/{id}")
@@ -114,7 +107,7 @@ public class PersonController {
                 person.orElseThrow(
                         () -> new ResponseStatusException(
                                 HttpStatus.INTERNAL_SERVER_ERROR,
-                                "The person has not be saved/updated, the login is already taken."
+                                "The person has not be saved, the login is already taken."
                         )
                 ),
                 new MultiValueMapAdapter<>(Map.of("Job4jCustomHeader", List.of("job4j"))),

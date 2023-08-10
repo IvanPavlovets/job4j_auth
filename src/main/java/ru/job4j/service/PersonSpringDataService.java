@@ -4,11 +4,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.job4j.domain.Person;
+import ru.job4j.domain.PersonDTO;
 import ru.job4j.repository.PersonRepository;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Optional;
 
 /**
@@ -48,52 +46,20 @@ public class PersonSpringDataService implements PersonService {
         return rsl;
     }
 
+
     /**
      * метод PATCH, который предназначен для частичного обновления данных.
-     * Для этого мы можем воспользоваться рефлексией для вызова нужных
-     * геттеров и сеттеров.
-     * @param person
-     * @return Optional<Person>
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
+     * подставляем найденому person, переданый password из DTO.
+     * @param personDTO
+     * @return
      */
     @Override
-    public Optional<Person> updatePatch(Person person) throws InvocationTargetException, IllegalAccessException {
-        var current = personRepository.findById(person.getId());
-        if (current.isEmpty()) {
-            throw new NullPointerException("Person id: " + person.getId() + " , not found");
-        }
-        var methods = current.get().getClass().getDeclaredMethods();
-        var namePerMethod = new HashMap<String, Method>();
-        for (var method : methods) {
-            String name = method.getName();
-            if (name.startsWith("get") || name.startsWith("set")) {
-                namePerMethod.put(name, method);
-            }
-        }
-        for (var name : namePerMethod.keySet()) {
-            if (name.startsWith("get")) {
-                Method getMethod = namePerMethod.get(name);
-                Method setMethod = namePerMethod.get(name.replace("get", "set"));
-                if (setMethod == null) {
-                    return Optional.empty();
-                }
-
-                Object newValue = getMethod.invoke(person);
-                if (newValue != null) {
-                    setMethod.invoke(current.get(), newValue);
-                }
-            }
-        }
-        personRepository.save(current.get());
-        return current;
-    }
-
-    @Override
-    public Optional<Person> update(Person person) {
-        var findedPerson = personRepository.findById(person.getId());
+    public Optional<Person> updatePatch(PersonDTO personDTO) {
+        var findedPerson = personRepository.findById(personDTO.getId());
         if (findedPerson.isPresent()) {
-            personRepository.save(person);
+            Person person = findedPerson.get();
+            person.setPassword(personDTO.getPassword());
+            return this.save(person);
         }
         return findedPerson;
     }

@@ -1,8 +1,8 @@
 package ru.job4j.service;
 
 import ru.job4j.domain.Person;
+import ru.job4j.domain.PersonDTO;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 
 public interface PersonService {
@@ -12,10 +12,7 @@ public interface PersonService {
 
     Optional<Person> save(Person person);
 
-    Optional<Person> updatePatch(Person person)
-            throws InvocationTargetException, IllegalAccessException;
-
-    Optional<Person> update(Person person);
+    Optional<Person> updatePatch(PersonDTO personDTO);
 
     Optional<Person> deleteById(int personId);
 
