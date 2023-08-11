@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.job4j.domain.Person;
-import ru.job4j.domain.PersonDTO;
+import ru.job4j.domain.PersonRecord;
 import ru.job4j.repository.PersonRepository;
 
 import java.util.Optional;
@@ -50,15 +50,15 @@ public class PersonSpringDataService implements PersonService {
     /**
      * метод PATCH, который предназначен для частичного обновления данных.
      * подставляем найденому person, переданый password из DTO.
-     * @param personDTO
+     * @param personRecord
      * @return Optional<Person>
      */
     @Override
-    public Optional<Person> updatePatch(PersonDTO personDTO) {
-        var findedPerson = personRepository.findById(personDTO.id());
+    public Optional<Person> updatePatch(PersonRecord personRecord) {
+        var findedPerson = personRepository.findById(personRecord.id());
         if (findedPerson.isPresent()) {
             Person person = findedPerson.get();
-            person.setPassword(personDTO.password());
+            person.setPassword(personRecord.password());
             return this.save(person);
         }
         return findedPerson;

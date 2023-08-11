@@ -10,7 +10,7 @@ import org.springframework.util.MultiValueMapAdapter;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.job4j.domain.Person;
-import ru.job4j.domain.PersonDTO;
+import ru.job4j.domain.PersonRecord;
 import ru.job4j.service.PersonService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -62,15 +62,15 @@ public class PersonController {
 
 
     @PutMapping("/")
-    public ResponseEntity<Person> updatePatch(@RequestBody PersonDTO personDTO) {
-        if (personDTO.password() == null) {
+    public ResponseEntity<Person> updatePatch(@RequestBody PersonRecord personRecord) {
+        if (personRecord.password() == null) {
             throw new NullPointerException("Password mustn't be empty");
         }
-        if (personDTO.password().length() < 3 || personDTO.password().isBlank()) {
+        if (personRecord.password().length() < 3 || personRecord.password().isBlank()) {
             throw new IllegalArgumentException(
                     "Invalid password. Password length must be more than 3 characters.");
         }
-        return getResponseEntityById(this.persons.updatePatch(personDTO), personDTO.id());
+        return getResponseEntityById(this.persons.updatePatch(personRecord), personRecord.id());
     }
 
     @DeleteMapping("/{id}")
