@@ -63,14 +63,14 @@ public class PersonController {
 
     @PutMapping("/")
     public ResponseEntity<Person> updatePatch(@RequestBody PersonDTO personDTO) {
-        if (personDTO.getPassword() == null) {
+        if (personDTO.password() == null) {
             throw new NullPointerException("Password mustn't be empty");
         }
-        if (personDTO.getPassword().length() < 3 || personDTO.getPassword().isEmpty() || personDTO.getPassword().isBlank()) {
+        if (personDTO.password().length() < 3 || personDTO.password().isBlank()) {
             throw new IllegalArgumentException(
                     "Invalid password. Password length must be more than 3 characters.");
         }
-        return getResponseEntityById(this.persons.updatePatch(personDTO), personDTO.getId());
+        return getResponseEntityById(this.persons.updatePatch(personDTO), personDTO.id());
     }
 
     @DeleteMapping("/{id}")

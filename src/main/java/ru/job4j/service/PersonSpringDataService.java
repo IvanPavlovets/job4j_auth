@@ -51,14 +51,14 @@ public class PersonSpringDataService implements PersonService {
      * метод PATCH, который предназначен для частичного обновления данных.
      * подставляем найденому person, переданый password из DTO.
      * @param personDTO
-     * @return
+     * @return Optional<Person>
      */
     @Override
     public Optional<Person> updatePatch(PersonDTO personDTO) {
-        var findedPerson = personRepository.findById(personDTO.getId());
+        var findedPerson = personRepository.findById(personDTO.id());
         if (findedPerson.isPresent()) {
             Person person = findedPerson.get();
-            person.setPassword(personDTO.getPassword());
+            person.setPassword(personDTO.password());
             return this.save(person);
         }
         return findedPerson;
