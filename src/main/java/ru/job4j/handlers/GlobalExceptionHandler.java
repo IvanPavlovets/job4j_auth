@@ -5,6 +5,8 @@ import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -12,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * аннотация @ControllerAdvice используемая совместно с @ExceptionHandler.
@@ -36,4 +40,23 @@ public class GlobalExceptionHandler {
         }}));
         LOG.error(e.getMessage());
     }
+
+    /**
+     * Добавим ValidatorControllerAdvise для MethodArgumentNotValidException.class
+     *
+     * @param exception MethodArgumentNotValidException
+     * @return ResponseEntity
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handelMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+        return ResponseEntity.badRequest().body(
+                exception.getFieldErrors().stream()
+                        .map(f -> Map.of(
+                                f.getField(),
+                                String.format("%s. Actual values: %s", f.getDefaultMessage(), f.getRejectedValue())
+                        ))
+                        .collect(Collectors.toList())
+        );
+    }
+
 }

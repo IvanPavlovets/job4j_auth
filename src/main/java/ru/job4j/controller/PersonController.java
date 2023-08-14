@@ -7,14 +7,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMapAdapter;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.job4j.domain.Person;
 import ru.job4j.domain.PersonRecord;
+import ru.job4j.handlers.Operation;
 import ru.job4j.service.PersonService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +42,8 @@ public class PersonController {
     private final ObjectMapper objectMapper;
 
     @PostMapping("/sign-up")
-    public ResponseEntity<Person> signUp(@RequestBody Person person) {
+    @Validated(Operation.OnCreate.class)
+    public ResponseEntity<Person> signUp(@Valid @RequestBody Person person) {
         if (person.getLogin() == null || person.getPassword() == null) {
             throw new NullPointerException("Login and password mustn't be empty");
         }
@@ -66,9 +70,10 @@ public class PersonController {
         if (personRecord.password() == null) {
             throw new NullPointerException("Password mustn't be empty");
         }
-        if (personRecord.password().length() < 3 || personRecord.password().isBlank()) {
+        if (personRecord.password().length() < 3 || personRecord.password().length() > 8
+                || personRecord.password().isBlank()) {
             throw new IllegalArgumentException(
-                    "Invalid password. Password length must be more than 3 characters.");
+                    "Invalid password. Password length must be more than 3 characters and less 8.");
         }
         return getResponseEntityById(this.persons.updatePatch(personRecord), personRecord.id());
     }
